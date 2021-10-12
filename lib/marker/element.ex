@@ -2,47 +2,47 @@ defmodule Marker.Element do
   @moduledoc """
     This module is responsible for generating element macro's. Marker generates by default all html5 elements,
     but you can easily generate other elements too:
-  
+
   ```elixir
   defmodule MyElements do
     use Marker.Element, tags: [:my_element, :another_one]
   end
   ```
-  
+
     You can now use your custom elements like the default elements:
-  
+
   ```elixir
   use MyElements
-  
+
   my_element id: 42 do
     another_one "Hello world"
   end
   ```
-  
+
     Which will result in:
-  
+
   ```elixir
   {:safe, "<my_element id='42'><another_one>Hello world</another_one></my_element>"}
   ```
-  
+
   ### Casing
-  
+
     You can control the casing of the generated elements too:
-  
+
   ```elixir
   defmodule MyElements do
     use Marker.Element, casing: :camel, tags: [:my_element, :another_one]
   end
-  
+
   my_element id: 42 do
     another_one "Hello world"
   end
-  
+
   {:safe, "<myElement id='42'><anotherOne>Hello world</anotherOne></myElement>"}
   ```
-  
+
   The following casing options are allowed:
-  
+
     * `:snake` => `my_element` (default)
     * `:snake_upcase` => `MY_ELEMENT`
     * `:pascal` => `MyElement`
@@ -147,6 +147,9 @@ defmodule Marker.Element do
       {[], [{:do, content}]} ->
         {[], content}
 
+      {[], content} ->
+        {[], content}
+
       {[{:do, {:__block__, _, content}}], nil} ->
         {[], content}
 
@@ -168,8 +171,11 @@ defmodule Marker.Element do
       {attrs, [{:do, content}]} when is_tuple(attrs) ->
         {attrs, content}
 
-      {content, nil} ->
+      {content, nil} when is_list(content) ->
         {[], content}
+
+      {content, nil} ->
+        {content, []}
 
       {content, [{_, _} | _] = attrs} ->
         {attrs, content}

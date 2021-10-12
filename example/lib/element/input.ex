@@ -16,8 +16,6 @@ defmodule Element.Input do
 
     input_ =
       div @attrs do
-        # div(Keyword.merge(@attrs, id: @id, class: "s e ctr ccy acr")) do
-        # input(id: @id, class: "s e ctr ccy acr") do
         span @id
       end
 

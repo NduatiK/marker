@@ -2,15 +2,15 @@ defmodule Marker.Compiler do
   @moduledoc """
   `Marker.Compiler` renders the element macros to html. It tries do as much work during macro expansion,
   resulting in a run time performance comparible to precompiled templates.
-
+  
   For example, this element call:
-
+  
   ```elixir
   div 1 + 1
   ```
-
+  
   will be expanded to this:
-
+  
   ```elixir
   "<div>" <> Marker.Encoder.encode(1 + 1) <> "</div>"
   ```
@@ -155,7 +155,7 @@ defmodule Marker.Compiler do
 
   for {char, entity} <- entity_map do
     defp escape(unquote(char) <> rest, acc) do
-      escape(rest, acc <> unquote(entity))
+      escape(rest, unquote(entity) <> acc)
     end
   end
 
@@ -168,26 +168,26 @@ defmodule Marker.Compiler do
   end
 
   defp add_chunk([acc | rest], chunk) when is_binary(acc) and is_binary(chunk) do
-    [acc <> chunk | rest]
+    rest ++ [acc <> chunk]
   end
 
   defp add_chunk(chunks, chunk) when is_binary(chunk) do
     if :ok == Macro.validate(chunks) do
       quote do
-        [unquote(chunk) | unquote(chunks)]
+        unquote(chunks) ++ [unquote(chunk)]
       end
     else
-      [chunk | chunks]
+      chunks ++ [chunk]
     end
   end
 
   defp add_chunk(chunks, {:safe, expr}) do
     if :ok == Macro.validate(chunks) do
       quote do
-        [unquote(expr) | unquote(chunks)]
+        unquote(chunks) ++ [expr]
       end
     else
-      [expr | chunks]
+      chunks ++ [expr]
     end
   end
 
@@ -195,11 +195,11 @@ defmodule Marker.Compiler do
     if :ok == Macro.validate(chunks) do
       quote do
         expr = Marker.Encoder.encode(unquote(chunk))
-        [expr | unquote(chunks)]
+        unquote(chunks) ++ [expr]
       end
     else
       expr = quote do: Marker.Encoder.encode(unquote(chunk))
-      [expr | chunks]
+      chunks ++ [expr]
     end
   end
 
@@ -209,9 +209,9 @@ defmodule Marker.Compiler do
 
   defp to_result(chunks) do
     if Macro.validate(chunks) == :ok do
-      {:safe, quote(do: {:safe, Marker.Compiler.concat(:lists.reverse(unquote(chunks)))})}
+      {:safe, quote(do: {:safe, Marker.Compiler.concat(unquote(chunks))})}
     else
-      {:safe, concat(:lists.reverse(chunks))}
+      {:safe, concat(chunks)}
     end
   end
 
@@ -223,6 +223,28 @@ defmodule Marker.Compiler do
     end)
   end
 
+  # defmacro concat(buffer) do
+  #   Enum.reduce(buffer, fn chunk, acc ->
+  #     quote do
+  #       unquote(acc) <> unquote(chunk)
+  #     end
+  #   end)
+  # end
+
+  # defp to_result(chunks) do
+  #   if Macro.validate(chunks) == :ok do
+  #     {:safe,
+  #      quote do
+  #        {:safe,
+  #         Enum.reduce(unquote(chunks), fn chunk, acc ->
+  #           # unquote_splicing()
+  #           unquote(acc) <> unquote(chunk)
+  #         end)}
+  #      end}
+  #   else
+  #     {:safe, concat(chunks)}
+  #   end
+  # end
   def expand(arg, env) do
     Macro.prewalk(arg, &Macro.expand_once(&1, env))
   end

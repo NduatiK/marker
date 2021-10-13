@@ -140,6 +140,7 @@ defmodule Marker.Element do
 
   @doc false
   def normalize_args(content_or_attrs, maybe_content, env) do
+    
     case {expand(content_or_attrs, env), expand(maybe_content, env)} do
       {[], [{:do, {:__block__, _, content}}]} ->
         {[], content}

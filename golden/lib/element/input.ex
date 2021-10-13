@@ -3,21 +3,33 @@ defmodule Element.Input do
   require Marker.HTML
   import Element
 
+  Marker.template :button do
+    on_click = @onPress
+    label = @__content__
+
+    button [] do
+      label
+    end
+
+    # button :
+    #   List (Attribute msg)
+    #   -> { onPress : Maybe msg
+    #      , label : Element msg
+    #      }
+    #   -> Element msg
+  end
+
   for position <- ~w[left right above below]a do
     def unquote(String.to_atom("label_" <> Atom.to_string(position)))(content) do
       {
         :label,
         unquote(position),
-        Marker.HTML.label class: "flex  text-sm font-medium text-gray-700" do
+        Marker.HTML.label class: "flex text-sm font-medium text-gray-700" do
           content
         end
-        # for: ,
       }
     end
   end
-
-  @space Element.spacing(3)
-  def a, do: Element.spacing(3)
 
   Marker.template :text do
     {:label, position, input_label} = @label
@@ -36,25 +48,25 @@ defmodule Element.Input do
 
     case position do
       :above ->
-        column class: Element.spacing_y(1) <> "mt-1 w-full max-w-xs mx-auto" do
+        column class: Element.spacing_y(1) <> "mt-1 w-full max-w-xs" do
           input_label
           input_
         end
 
       :below ->
-        column class: Element.spacing_y(1) <> "mt-1 w-full max-w-xs mx-auto" do
+        column class: Element.spacing_y(1) <> "mt-1 w-full max-w-xs" do
           input_
           input_label
         end
 
       :left ->
-        row class: Element.spacing_x(4) <> "mt-1 w-full max-w-xs mx-auto" do
+        row class: Element.spacing_x(4) <> "mt-1 w-full max-w-xs" do
           input_label
           input_
         end
 
       :right ->
-        row class: Element.spacing_x(2) <> "mt-1 w-full max-w-xs mx-auto" do
+        row class: Element.spacing_x(2) <> "mt-1 w-full max-w-xs" do
           input_
           input_label
         end

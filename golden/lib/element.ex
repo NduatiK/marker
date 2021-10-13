@@ -2,14 +2,40 @@ defmodule Element do
   use Marker
   require Marker.HTML
 
+  def merge_attr(default_attrs, assigns) do
+    imported_attrs =
+      assigns
+      |> Map.to_list()
+      |> Enum.filter(fn
+        {:__content__, v} -> false
+        {k, v} -> true
+      end)
+
+    attrs =
+      Keyword.merge(default_attrs, imported_attrs, fn
+        k, v1, v2 when is_binary(v1) and is_binary(v2) ->
+          v1 <> " " <> v2
+
+        _, _, v2 ->
+          v2
+      end)
+  end
+
   Marker.component :column do
-    div class: (@class || "") <> " flex flex-col" do
+    default_attrs = [class: (@class || "") <> " flex flex-col"]
+    attrs = merge_attr(default_attrs, assigns)
+
+    div attrs do
       @__content__
     end
   end
 
   Marker.component :row do
-    div class: (@class || "") <> " flex flex-row items-center" do
+    default_attrs = [class: (@class || "") <> " flex flex-row items-center"]
+
+    attrs = merge_attr(default_attrs, assigns)
+
+    div attrs do
       @__content__
     end
   end

@@ -3,6 +3,35 @@ defmodule GoldenWeb.UserLive.FormComponent do
 
   alias Golden.Accounts
 
+  def render(assigns) do
+    ~H"""
+      <div>
+      <h2><%= @title %></h2>
+
+      <.form
+        let={f}
+        for={@changeset}
+        id="user-form"
+        phx-target={@myself}
+        phx-change="validate"
+        phx-submit="save">
+
+
+        <%= label f, :name %>
+        <%= text_input f, :name %>
+        <%= error_tag f, :name %>
+
+        <%= label f, :age %>
+        <%= number_input f, :age %>
+        <%= error_tag f, :age %>
+
+        <div>
+          <%= submit "Save", phx_disable_with: "Saving..." %>
+        </div>
+      </.form>
+    </div>
+    """
+  end
 
   @impl true
   def update(%{user: user} = assigns, socket) do

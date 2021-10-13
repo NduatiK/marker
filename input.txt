@@ -1,0 +1,128 @@
+input
+focusedOnLoad : Attribute msg
+button :
+    List (Attribute msg)
+    -> { onPress : Maybe msg
+       , label : Element msg
+       }
+    -> Element msg
+checkbox :
+    List (Attribute msg)
+    -> { onChange : Bool -> msg
+       , icon : Bool -> Element msg
+       , checked : Bool
+       , label : Label msg
+       }
+    -> Element msg
+defaultCheckbox : Bool -> Element msg
+text :
+    List (Attribute msg)
+    -> { onChange : String -> msg
+       , text : String
+       , placeholder : Maybe (Placeholder msg)
+       , label : Label msg
+       }
+    -> Element msg
+multiline :
+    List (Attribute msg)
+    -> { onChange : String -> msg
+       , text : String
+       , placeholder : Maybe (Placeholder msg)
+       , label : Label msg
+       , spellcheck : Bool
+       }
+    -> Element msg
+type Placeholder msg
+placeholder : List (Attribute msg) -> Element msg -> Placeholder msg
+username :
+    List (Attribute msg)
+    -> { onChange : String -> msg
+       , text : String
+       , placeholder : Maybe (Placeholder msg)
+       , label : Label msg
+       }
+    -> Element msg
+newPassword :
+    List (Attribute msg)
+    -> { onChange : String -> msg
+       , text : String
+       , placeholder : Maybe (Placeholder msg)
+       , label : Label msg
+       , show : Bool
+       }
+    -> Element msg
+currentPassword :
+    List (Attribute msg)
+    -> { onChange : String -> msg
+       , text : String
+       , placeholder : Maybe (Placeholder msg)
+       , label : Label msg
+       , show : Bool
+       }
+    -> Element msg
+email :
+    List (Attribute msg)
+    -> { onChange : String -> msg
+       , text : String
+       , placeholder : Maybe (Placeholder msg)
+       , label : Label msg
+       }
+    -> Element msg
+search :
+    List (Attribute msg)
+    -> { onChange : String -> msg
+       , text : String
+       , placeholder : Maybe (Placeholder msg)
+       , label : Label msg
+       }
+    -> Element msg
+spellChecked :
+    List (Attribute msg)
+    -> { onChange : String -> msg
+       , text : String
+       , placeholder : Maybe (Placeholder msg)
+       , label : Label msg
+       }
+    -> Element msg
+slider :
+    List (Attribute msg)
+    -> { onChange : Float -> msg
+       , label : Label msg
+       , min : Float
+       , max : Float
+       , value : Float
+       , thumb : Thumb
+       , step : Maybe Float
+       }
+    -> Element msg
+thumb : List (Attribute Never) -> Thumb
+defaultThumb : Thumb
+radio :
+    List (Attribute msg)
+    -> { onChange : option -> msg
+       , options : List (Option option msg)
+       , selected : Maybe option
+       , label : Label msg
+       }
+    -> Element msg
+radioRow :
+    List (Attribute msg)
+    -> { onChange : option -> msg
+       , options : List (Option option msg)
+       , selected : Maybe option
+       , label : Label msg
+       }
+    -> Element msg
+type Option value msg
+option : value -> Element msg -> Option value msg
+optionWith : value -> (OptionState -> Element msg) -> Option value msg
+type OptionState
+    = Idle
+    | Focused
+    | Selected
+type Label msg
+labelAbove : List (Attribute msg) -> Element msg -> Label msg
+labelBelow : List (Attribute msg) -> Element msg -> Label msg
+labelLeft : List (Attribute msg) -> Element msg -> Label msg
+labelRight : List (Attribute msg) -> Element msg -> Label msg
+labelHidden : String -> Label msg

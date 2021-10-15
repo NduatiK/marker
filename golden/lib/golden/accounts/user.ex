@@ -5,6 +5,7 @@ defmodule Golden.Accounts.User do
   schema "users" do
     field :age, :integer
     field :name, :string
+    field :email, :string
 
     timestamps()
   end

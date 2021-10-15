@@ -166,17 +166,47 @@ defmodule GoldenWeb.MarkerView do
   # end
 
   import ElmView
+  alias ElmView.Input
   require ElmView
 
+  @dom column([], [
+         #  text("<-"),
+         #  text("&"),
+         #  text("\""),
+         #  text("'"),
+         #  text("Hello"),
+         #  text("There"),
+         #  text("Hello There"),
+         text(["Hello There ", {:title, &String.upcase/1}]),
+         ElmView.row([], [
+           text("<-"),
+           text("->")
+         ]),
+         Input.text(
+           [id: "aj"],
+           Input.label_above([], "Above")
+         ),
+         Input.text(
+           [id: "aj"],
+           Input.label_below([], "Below")
+         ),
+         Input.text(
+           [id: "aj"],
+           Input.label_left([], "Left")
+         ),
+         Input.text(
+           [id: "aj"],
+           Input.label_right([], "Right")
+         )
+       ])
+       |> ElmView.Renderer.render()
+       |> IO.inspect()
+
   def index(assigns) do
-    column([], [
-      h2(:title),
-      text("Hello"),
-      text("Hello" <> " There")
-    ])
+    @dom
     |> compile()
   end
 
   # def render("index.html", assigns), do: index(IO.inspect(assigns)) |> IO.inspect()
-  def render("index.html", assigns), do: index(%{title: "Let's go"}) |> IO.inspect()
+  def render("index.html", assigns), do: index(%{title: "Let's go"})
 end

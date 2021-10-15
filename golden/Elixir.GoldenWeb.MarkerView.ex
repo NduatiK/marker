@@ -35,7 +35,7 @@ defmodule GoldenWeb.MarkerView do
   end
 
   def render("index.html", assigns) do
-    IO.inspect(index(%{title: "Let's go"}))
+    index(%{title: "Let's go"})
   end
 
   def render(template, assigns) do
@@ -67,7 +67,7 @@ defmodule GoldenWeb.MarkerView do
             case(Phoenix.LiveView.Engine.changed_assign?(changed, :title)) do
               true ->
                 Phoenix.LiveView.Engine.live_to_iodata(
-                  Phoenix.LiveView.Engine.fetch_assign!(assigns, :title)
+                  String.upcase(Phoenix.LiveView.Engine.fetch_assign!(assigns, :title))
                 )
 
               false ->
@@ -78,9 +78,12 @@ defmodule GoldenWeb.MarkerView do
         end
 
         %Phoenix.LiveView.Rendered{
-          static: ["<div class='flex flex-row items-center'><h2>", "</h2></div>"],
+          static: [
+            "<div class='flex flex-col items-center'><span>Hello</span><span>There</span><span>Hello There</span><span>Hello There ",
+            "</span></div>"
+          ],
           dynamic: dynamic,
-          fingerprint: 248_969_558_396_341_601_684_340_754_016_429_898_253,
+          fingerprint: 160_426_268_321_480_674_266_697_170_934_817_320_176,
           root: true
         }
       )

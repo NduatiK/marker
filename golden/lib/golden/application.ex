@@ -9,7 +9,7 @@ defmodule Golden.Application do
   def start(_type, _args) do
     children = [
       # Start the Ecto repository
-      # Golden.Repo,
+      Golden.Repo,
       # Start the Telemetry supervisor
       GoldenWeb.Telemetry,
       # Start the PubSub system

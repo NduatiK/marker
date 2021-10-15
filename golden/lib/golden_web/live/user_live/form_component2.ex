@@ -1,49 +1,40 @@
 defmodule GoldenWeb.UserLive.FormComponent2 do
-  use GoldenWeb, :live_component
+  use GoldenWeb, :live_view
 
-  use Marker
-  require Marker.HTML
-  import Element
-  alias Element.Input, as: Input
-  alias Golden.Accounts
+  import ElmView
+  alias ElmView.Input
+  require ElmView
 
+  #  column([id: "project-info-{@id}"], [
+  @dom ElmView.render(
+         column([padding: 4], [
+           text(:h4, "It starts now!"),
+           row([spacing: 8], [
+             Input.button([],
+               on_press: :decrement,
+               label: text("<-")
+             ),
+             text(:counter),
+             Input.button([],
+               on_press: :increment,
+               label: text("->")
+             )
+           ])
+         ])
+       )
+
+  @impl true
   def render(assigns) do
-    ~H"""
-    """
+    compile(@dom)
+  end
 
-    column spacing: 4, id: "av", class: "mango" do
-      Input.text(
-        id: "above",
-        attrs: [id: "aj"],
-        label: Input.label_above("Above")
-      )
+  @topic "form"
 
-      # input(
-      #   class:
-      #     "w-full px-3 py-2 text-sm leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline",
-      #   id: "firstName",
-      #   type: "text",
-      #   placeholder: "First Name"
-      # )
+  @impl true
+  def mount(_params, _session, socket) do
+    GoldenWeb.Endpoint.subscribe(@topic)
 
-      Input.text(
-        id: "below",
-        attrs: [],
-        label: Input.label_below("Below")
-      )
-
-      Input.text(
-        id: "left",
-        attrs: [],
-        label: Input.label_left("Left")
-      )
-
-      Input.text(
-        id: "right",
-        attrs: [],
-        label: Input.label_right("Right")
-      )
-    end
+    {:ok, assign(socket, :counter, 0)}
   end
 
   @impl true
@@ -57,42 +48,34 @@ defmodule GoldenWeb.UserLive.FormComponent2 do
   end
 
   @impl true
-  def handle_event("validate", %{"user" => user_params}, socket) do
-    changeset =
-      socket.assigns.user
-      |> Accounts.change_user(user_params)
-      |> Map.put(:action, :validate)
+  def handle_event("increment", _, socket) do
+    counter =
+      socket.assigns.counter
+      |> then(fn
+        num when is_integer(num) -> num + 1
+        _ -> 1
+      end)
 
-    {:noreply, assign(socket, :changeset, changeset)}
+    GoldenWeb.Endpoint.broadcast_from(self(), @topic, "update_event", counter)
+
+    {:noreply, assign(socket, :counter, counter)}
   end
 
-  def handle_event("save", %{"user" => user_params}, socket) do
-    save_user(socket, socket.assigns.action, user_params)
+  @impl true
+  def handle_event("decrement", _, socket) do
+    counter =
+      socket.assigns.counter
+      |> then(fn
+        num when is_integer(num) -> num - 1
+        _ -> 0
+      end)
+
+    GoldenWeb.Endpoint.broadcast_from(self(), @topic, "update_event", counter)
+
+    {:noreply, assign(socket, :counter, counter)}
   end
 
-  defp save_user(socket, :edit, user_params) do
-    case Accounts.update_user(socket.assigns.user, user_params) do
-      {:ok, _user} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "User updated successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :changeset, changeset)}
-    end
-  end
-
-  defp save_user(socket, :new, user_params) do
-    case Accounts.create_user(user_params) do
-      {:ok, _user} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "User created successfully")
-         |> push_redirect(to: socket.assigns.return_to)}
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, changeset: changeset)}
-    end
+  def handle_info(%{topic: @topic, payload: counter}, socket) do
+    {:noreply, assign(socket, :counter, counter)}
   end
 end

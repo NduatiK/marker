@@ -26,10 +26,6 @@ defmodule ElmView do
       module: __CALLER__.module
     ]
 
-    # quote do
-    #   EEx.compile_string(unquote(tree), unquote(options))
-    # end
-    # ElmView.expand(str, __CALLER__)
     EEx.compile_string(ElmView.expand(tree, __CALLER__), options)
   end
 
@@ -52,16 +48,16 @@ defmodule ElmView do
   end
 
   defimpl Renderer, for: Column do
+    @default [class: "flex flex-col"]
+    @reject_attr [:spacing_x]
     def render(column) do
-      children =
-        Enum.reduce(column.children, "", fn child, acc ->
-          acc <> Renderer.render(child)
-        end)
-
-      "<div class='flex flex-col items-center'" <>
-        ">" <>
-        children <>
-        "</div>"
+      :div
+      |> ElmView.Attributes.to_html(
+        @default,
+        column.attr,
+        reject_attr: @reject_attr,
+        children: ElmView.expand_children(column)
+      )
     end
   end
 
@@ -74,16 +70,16 @@ defmodule ElmView do
   end
 
   defimpl Renderer, for: Row do
+    @default [class: "flex items-center"]
+    @reject_attr [:spacing_y]
     def render(row) do
-      children =
-        Enum.reduce(row.children, "", fn child, acc ->
-          acc <> Renderer.render(child)
-        end)
-
-      "<div class='flex items-center'" <>
-        ">" <>
-        children <>
-        "</div>"
+      ElmView.Attributes.to_html(
+        :div,
+        @default,
+        row.attr,
+        reject_attr: @reject_attr,
+        children: ElmView.expand_children(row)
+      )
     end
   end
 
@@ -92,26 +88,37 @@ defmodule ElmView do
   end
 
   defmodule Text do
-    defstruct attr: [], content: ""
+    defstruct attr: [], content: "", type: "span"
   end
 
   defimpl Renderer, for: Text do
     def render(text) do
-      "<span>" <> text.content <> "</span>"
+      "<#{text.type}>" <> text.content <> "</#{text.type}>"
     end
   end
 
-  def text(content) when is_binary(content) or is_atom(content) do
-    text([content])
+  for type <- ~w[h1 h2 h3 h4 h5 h6]a do
+    def text(unquote(type), content) do
+      do_text(unquote(type), content)
+    end
   end
 
-  def text({key, func} = content) when is_atom(key) or is_function(func, 1) do
-    text([content])
+  def text(content), do: text(:body, content)
+
+  def text(:body, content), do: do_text(:span, content)
+
+  defp do_text(type, content) when is_binary(content) or is_atom(content) do
+    do_text(type, [content])
   end
 
-  def text(content) when is_list(content) do
+  defp do_text(type, {key, func} = content) when is_atom(key) or is_function(func, 1) do
+    do_text(type, [content])
+  end
+
+  defp do_text(type, content) when is_list(content) do
     %Text{
       attr: [],
+      type: type,
       content:
         content
         |> Enum.map(fn
@@ -134,5 +141,17 @@ defmodule ElmView do
 
   def render(item) do
     Renderer.render(item)
+  end
+
+  def expand_children(%{children: children}) do
+    Enum.reduce(children, "", fn child, acc ->
+      acc <> Renderer.render(child)
+    end)
+  end
+
+  def expand_children(children) do
+    Enum.reduce(children, "", fn child, acc ->
+      acc <> Renderer.render(child)
+    end)
   end
 end

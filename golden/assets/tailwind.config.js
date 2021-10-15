@@ -13,6 +13,8 @@ module.exports = {
         ],
         content: ["./js/**/*.js",
             "../lib/element.ex",
+            "../Elixir.GoldenWeb.MarkerView.ex",
+            "../Elixir.GoldenWeb.UserLive.FormComponent2.ex",
             "../Elixir.Element.Input.ex",
             "../lib/element/**/*.*ex", "../lib/*_web/**/*.*ex"
         ]

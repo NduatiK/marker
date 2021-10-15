@@ -21,5 +21,6 @@ defmodule ElmView.Helpers do
     acc
   end
 
-  def escape(str), do: escape(str, "")
+  def escape(str) when is_binary(str), do: escape(str, "")
+  def escape(not_str), do: not_str
 end

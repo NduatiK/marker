@@ -67,7 +67,9 @@ defmodule GoldenWeb.MarkerView do
             case(Phoenix.LiveView.Engine.changed_assign?(changed, :title)) do
               true ->
                 Phoenix.LiveView.Engine.live_to_iodata(
-                  String.upcase(Phoenix.LiveView.Engine.fetch_assign!(assigns, :title))
+                  ElmView.Helpers.escape(
+                    (&String.upcase/1).(Phoenix.LiveView.Engine.fetch_assign!(assigns, :title))
+                  )
                 )
 
               false ->
@@ -79,11 +81,11 @@ defmodule GoldenWeb.MarkerView do
 
         %Phoenix.LiveView.Rendered{
           static: [
-            "<div class='flex flex-col items-center'><span>Hello</span><span>There</span><span>Hello There</span><span>Hello There ",
-            "</span></div>"
+            "<div class='flex flex-col items-center space-x-2' class='space-y-2'><span>Hello There ",
+            "</span><div class='flex items-center space-x-4' class='space-y-4'><span>&lt;-</span><span>-&gt;</span></div><div class='flex flex-col items-center space-x-2' class='space-y-2' class='mt-1 w-full max-w-xs'><label class='flex text-sm font-medium text-gray-700'>Above</label> <input class='focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-3 sm:text-sm border-gray-300 rounded-md' type='text'></div><div class='flex flex-col items-center space-x-2' class='space-y-2' class='mt-1 w-full max-w-xs'><input class='focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-3 sm:text-sm border-gray-300 rounded-md' type='text'><label class='flex text-sm font-medium text-gray-700'>Below</label> </div><div class='flex items-center space-x-2' class='space-y-2' class='mt-1 w-full max-w-xs'><label class='flex text-sm font-medium text-gray-700'>Left</label> <input class='focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-3 sm:text-sm border-gray-300 rounded-md' type='text'></div><div class='flex items-center space-x-2' class='space-y-2' class='mt-1 w-full max-w-xs'><input class='focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-3 sm:text-sm border-gray-300 rounded-md' type='text'><label class='flex text-sm font-medium text-gray-700'>Right</label> </div></div>"
           ],
           dynamic: dynamic,
-          fingerprint: 160_426_268_321_480_674_266_697_170_934_817_320_176,
+          fingerprint: 204_965_056_843_497_861_213_772_403_208_637_333_988,
           root: true
         }
       )

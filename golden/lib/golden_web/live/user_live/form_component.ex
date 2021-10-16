@@ -3,34 +3,93 @@ defmodule GoldenWeb.UserLive.FormComponent do
 
   alias Golden.Accounts
 
+  alias ElmView.Input
+  require ElmView
+  import ElmView
+
+  # ],
+
+  @form el(
+          [],
+          Input.form(
+            %{
+              changeset: :changeset,
+              on_change: :validate,
+              on_submit: :save,
+              target: :myself,
+              id: "user-form2"
+            },
+            "#",
+            [],
+            [
+              column([spacing: 4], [
+                ElmView.Input.text(
+                  [form: :f, id: :name],
+                  [],
+                  ElmView.Input.label_above([], "Name")
+                ),
+                ElmView.Input.text(
+                  [form: :f, id: :age],
+                  [],
+                  ElmView.Input.label_above([], "Age")
+                ),
+                ElmView.Input.text(
+                  [form: :f, id: :email],
+                  [],
+                  ElmView.Input.label_above([], "Email")
+                ),
+                ElmView.Input.text(
+                  [form: :f, id: :image],
+                  [],
+                  ElmView.Input.label_above([], "Image")
+                ),
+                ElmView.Input.button(
+                  [
+                    type: "submit",
+                    phx_disable_with: "Saving..."
+                  ],
+                  on_press: nil,
+                  label: ElmView.text("Submit")
+                )
+
+                # <div>
+                #   <%= submit "Save", phx_disable_with: "Saving..." %>
+                # </div>])
+              ])
+            ]
+          )
+        )
+        |> ElmView.render()
+        |> IO.inspect()
+
   def render(assigns) do
-    ~H"""
-      <div>
-      <h2><%= @title %></h2>
+    # ~H"""
+    #   <div>
+    #   <h2><%= @title %></h2>
 
-      <.form
-        let={f}
-        for={@changeset}
-        id="user-form"
-        phx-target={@myself}
-        phx-change="validate"
-        phx-submit="save">
+    #   <.form
+    #     let={f}
+    #     for={@changeset}
+    #     id="user-form"
+    #     phx-target={@myself}
+    #     phx-change="validate"
+    #     phx-submit="save">
 
+    #     <%= label f, :name %>
+    #     <%= text_input f, :name %>
+    #     <%= error_tag f, :name %>
 
-        <%= label f, :name %>
-        <%= text_input f, :name %>
-        <%= error_tag f, :name %>
+    #     <%= label f, :age %>
+    #     <%= number_input f, :age %>
+    #     <%= error_tag f, :age %>
 
-        <%= label f, :age %>
-        <%= number_input f, :age %>
-        <%= error_tag f, :age %>
-
-        <div>
-          <%= submit "Save", phx_disable_with: "Saving..." %>
-        </div>
-      </.form>
-    </div>
-    """
+    #     <div>
+    #       <%= submit "Save", phx_disable_with: "Saving..." %>
+    #     </div>
+    #   </.form>
+    # </div>
+    # """
+    ElmView.compile(@form)
   end
 
   @impl true
@@ -44,7 +103,7 @@ defmodule GoldenWeb.UserLive.FormComponent do
   end
 
   @impl true
-  def handle_event("validate", %{"user" => user_params}, socket) do
+  def handle_event("validate", %{"f" => user_params}, socket) do
     changeset =
       socket.assigns.user
       |> Accounts.change_user(user_params)
@@ -53,7 +112,7 @@ defmodule GoldenWeb.UserLive.FormComponent do
     {:noreply, assign(socket, :changeset, changeset)}
   end
 
-  def handle_event("save", %{"user" => user_params}, socket) do
+  def handle_event("save", %{"f" => user_params}, socket) do
     save_user(socket, socket.assigns.action, user_params)
   end
 
@@ -62,7 +121,7 @@ defmodule GoldenWeb.UserLive.FormComponent do
       {:ok, _user} ->
         {:noreply,
          socket
-         |> put_flash(:info, "User updated successfully")
+        |> put_flash(:info, "User updated successfully")
          |> push_redirect(to: socket.assigns.return_to)}
 
       {:error, %Ecto.Changeset{} = changeset} ->

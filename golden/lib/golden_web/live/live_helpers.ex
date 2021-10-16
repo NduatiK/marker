@@ -7,7 +7,7 @@ defmodule GoldenWeb.LiveHelpers do
   The rendered modal receives a `:return_to` option to properly update
   the URL when the modal is closed.
 
-  ## Examples
+  ## Exampleswwww
 
       <%= live_modal GoldenWeb.UserLive.FormComponent,
         id: @user.id || :new,

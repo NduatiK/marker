@@ -9,12 +9,7 @@
     return_to: Routes.user_show_path(@socket, :show, @user) %>
 <% end %>
 
- <%= live_render(@socket,  GoldenWeb.UserLive.FormComponent2,
-    id: "#{@user.id}",
-    title: @page_title,
-    user: @user,
-    return_to: Routes.user_show_path(@socket, :show, @user))
-    %>
+
 <ul>
 
   <li>
